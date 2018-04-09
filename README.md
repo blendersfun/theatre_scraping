@@ -23,9 +23,10 @@ Todo
 ====
 
  - [x] Implement caching of html documents by url.
- - [ ] Implement the extraction of the raw data.
- - [ ] Create a JSON schema to represent to canonical format for this first data type.
+ - [x] Implement the extraction of the raw data.
+ - [x] Create a JSON schema to represent to canonical format for this first data type.
  - [ ] Implement normalization and transformation functions to map the data onto the canonical format.
+ - [ ] Implement system tests to assert that this first channel is still working against the latest cached original.
 
 Design
 ======
@@ -41,3 +42,18 @@ The ingestion of data will be a several step process:
  - Normalization: converting the raw string data into a canonical untransformed input format. Normalizers should be simple, but often particular per situation.
  - Transformation: take a valid form of input and transform it into the canonical data format. Transformers may perform complex transformations and calculations, but should be abstracted from the particulars of a given situation.
  - Deduplication: this is where repeated data referring to the same real-world objects are collapsed together to form one authoritative version. Which sources get preferences and how multiple copies are identified as being the same still needs thought.
+
+Data Modelling
+==============
+
+*Research*
+
+Addresses:
+ - http://blog.usgeocoder.com/mailing-address-vs-physical-address/
+ - https://smartystreets.com/articles/standardization-and-validation
+ - https://pe.usps.com/text/pub28/welcome.htm
+ - http://www.geonames.org/
+
+ *Thoughts*
+
+The data I've excluded in my first round of modelling is metadata produced by the people behind the source I'm referencing. There's a couple things about this. This is data they created, it is not hard fact, it is context, elaboration, interpretation. Re-publishing *facts* (with permission) is the point of this project. Republishing *interpretations* seems fishy for multiple reasons. However, for this dataset to be of use, it must have metadata. It seems to me that collecting and cross-referencing data in an automated fashion is a neat trick, but it only becomes useful when it is tagged, described, given context, etc. The creation of metadata for this progressively updating dataset is where I anticipate the real work of this project being.

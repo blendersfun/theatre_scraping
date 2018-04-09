@@ -4,11 +4,13 @@
   "description": "Webscraping of theatre data.",
   "main": "src/index.js",
   "scripts": {
-    "test": "mocha ./test"
+    "test": "mocha ./test/**/*.js",
+    "start": "node ./src/index.js"
   },
   "author": "Aaron Moore <two.a.ron@gmail.com>",
   "license": "ISC",
   "dependencies": {
+    "ajv": "^6.4.0",
     "chai": "^4.1.2",
     "cheerio": "^1.0.0-rc.2",
     "lodash": "^4.17.5",

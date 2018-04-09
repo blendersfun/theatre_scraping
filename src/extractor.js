@@ -21,6 +21,8 @@ class Extractor {
         }
         let $collection = $el(params.query)
         if (params.filter) $collection = $collection.filter(params.filter)
+        if (params.has) $collection = $collection.has(params.has)
+        if (params.not) $collection = $collection.not(params.not)
         return $collection.map((i, child) => {
             return parseFn($el(child))
         }).get()
@@ -52,7 +54,8 @@ class Extractor {
     // Specific extractors for urls:
     static theStrangerEventsPerformance($) {
         return this.getCollection($, {
-            query: '.calendar-post'
+            query: '.calendar-post',
+            not: '.fish-butter'
         }, $post => {
             return {
                 title:         this.getText($post, '.calendar-post-title > a'),
@@ -64,7 +67,7 @@ class Extractor {
 
                 ticketsUrl:    this.getUrl($post, '.buy-tickets-button'),
                 detailPageUrl: this.getUrl($post, '.calendar-post-title > a'),
-                
+
                 isPicked:      this.hasElement($post, '.icon-picked')
             }
         })
