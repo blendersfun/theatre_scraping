@@ -1,21 +1,10 @@
 const {expect} = require('chai')
-const Ajv = require('ajv')
 const schemas = require('../../src/schema/canonical')
-const metaSchema = require('ajv/lib/refs/json-schema-draft-07.json')
 
 describe('canonical.Dataset schema', function () {
     let ajv
     beforeEach(function () {
-        ajv = new Ajv({ meta: false })
-        ajv.addMetaSchema(metaSchema) // Explicit, for future proofing
-        ajv.addSchema(schemas.Dataset)
-        ajv.addSchema(schemas.Source)
-        ajv.addSchema(schemas.SourceURL)
-        ajv.addSchema(schemas.Production)
-        ajv.addSchema(schemas.Performance)
-        ajv.addSchema(schemas.Venue)
-        ajv.addSchema(schemas.Address)
-        ajv.addSchema(schemas.AddressUSA)
+        ajv = schemas.newAjv()
     })
     it('is a valid draft-07 JSON Schema', function () {
         const validate = ajv.getSchema(schemas.Dataset.$id)

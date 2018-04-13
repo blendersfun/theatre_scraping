@@ -10,29 +10,40 @@ const _ = require('lodash')
 
 const {loader} = require('./loader')
 const {Extractor} = require('./extractor')
+const {Normalizer} = require('./normalizer')
 
 const entryPoint = 'https://www.thestranger.com/events/performance'
 
 loader.loadUrl(entryPoint).then($ => {
-    console.log(_.chain(Extractor.extract(entryPoint, $))
-        .map(event => event)
-        .filter(event => event)//.dates.indexOf('Second') === 0)
-        .take(1000)
-        .value()
-    )
+    let extracted = Extractor.extract(entryPoint, $)
+    console.log(_.chain(extracted.events)
+        .map(event => event.venue)
+        .filter(event => event)
+        .slice(0, 100)
+        .value())
+    return extracted
+}).then(dataset => {
+    console.log('---')
+    let normalized = Normalizer.normalize(dataset)
+    console.log(JSON.stringify(_.chain(normalized.productions)
+        .map(productions => productions)
+        .filter(productions => productions)
+        .slice(0, 1000)
+        .value(), null, 2))
+    // console.log(normalized)
 }).catch(e => {
     console.log('Uncaught Error: \n---\n', e)
 })
 
 /*
  Data indended for ingestion so far:
-  - title
-  - venue
+  x title
+  x venue
   - dates
   - price
-  - ticketsUrl
-  - detailPageUrl
-  - the current url
+  x ticketsUrl
+  x detailPageUrl
+  x the current url
 
  Date intended for exclusion so far:
   - neighborhood

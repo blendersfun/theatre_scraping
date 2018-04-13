@@ -1,6 +1,9 @@
 // A collection of JSON schema objects which describe the canonical
 // representations of the various real-world entities being modelled.
 
+const Ajv = require('ajv')
+const metaSchema = require('ajv/lib/refs/json-schema-draft-07.json')
+
 const AddressUSA = {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "$id": "http://dreamforgers.dreamhosters.com/aaron/schemas/canon/addressUSA.json",
@@ -95,6 +98,10 @@ const Venue = {
         "name": {
             "type": "string"
         },
+        "aliases": {
+            "type": "array",
+            "items": { "type": "string" }
+        },
         "address": { "$ref": "address.json" }
     }
 }
@@ -128,11 +135,12 @@ const Production = {
         },
         "price": {
             "type": "object",
-            "required": ["currency", "amount"],
+            "required": ["currency"],
             "additionalProperties": false,
             "properties": {
                 "currency": { "$ref": "#/definitions/currency" },
-                "amount": { "type": "number" }
+                "amount": { "type": "number" },
+                "pwyc": { "type": "boolean" }
             }
         }
     },
@@ -194,7 +202,7 @@ const Production = {
         "prices": {
             "type": "array",
             "items": { "$ref": "#/definitions/price" }
-        }
+        },
         "priceRange": {
             "type": "object",
             "required": ["currency", "min", "max"],
@@ -268,6 +276,20 @@ const Dataset = {
     }
 }
 
+function newAjv() {
+    ajv = new Ajv({ meta: false })
+    ajv.addMetaSchema(metaSchema) // Explicit, for future proofing
+    ajv.addSchema(Dataset)
+    ajv.addSchema(Source)
+    ajv.addSchema(SourceURL)
+    ajv.addSchema(Production)
+    ajv.addSchema(Performance)
+    ajv.addSchema(Venue)
+    ajv.addSchema(Address)
+    ajv.addSchema(AddressUSA)
+    return ajv
+}
+
 module.exports = {
     Dataset,
     Source,
@@ -276,5 +298,6 @@ module.exports = {
     Performance,
     Venue,
     Address,
-    AddressUSA
+    AddressUSA,
+    newAjv
 }

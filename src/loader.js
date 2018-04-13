@@ -27,18 +27,28 @@ class Loader {
                 return Loader.request({
                     url
                 }).then(response => {
-                    let filePath = path.join(this.cachePath, Loader.sanitizeFilename(url + '.' + Loader.getCurrentUtcMoment().format()))
+                    let timestamp = Loader.getCurrentUtcMoment().format()
+                    let filePath = path.join(this.cachePath, Loader.sanitizeFilename(url + '.' + timestamp))
                     return Loader.ensureCacheExists(this.cachePath).then(() => Loader.writeFile( // And write it to the cache.
                         filePath,
                         response.body,
                         { encoding: 'utf-8' }
-                    )).then(() => response.body)
+                    )).then(() => {
+                        return {
+                            body: response.body,
+                            timestamp
+                        }
+                    })
                 })
             } else {
                 throw err
             }
-        }).then(body => {
-            return cheerio.load(body, { normalizeWhitespace: true })
+        }).then(({body, timestamp}) => {
+            return {
+                url,
+                $: cheerio.load(body, { normalizeWhitespace: true }),
+                timestamp
+            }
         })
     }
     static sanitizeFilename(str) {
@@ -85,16 +95,19 @@ class Loader {
             }).value()
             let mostRecent = cacheCandidates[0]
             if (mostRecent && Loader.getCurrentUnixTimestamp() - mostRecent.datetime.valueOf() < maxAge) {
-                return mostRecent.filename;
+                return mostRecent;
             }
             let error = new Error(`No cache entry for '${url}' could be found more recent than one day old.`)
             error.code = 'NOTCACHED'
             return Promise.reject(error);
-        }).then(cachedFileName => {
+        }).then(entry => {
+            let {filename, timestamp} = entry
             return Loader.readFile( // Try to read the file from the cache.
-                path.join(cachePath, cachedFileName),
+                path.join(cachePath, filename),
                 { encoding: 'utf-8' }
-            )
+            ).then(body => {
+                return { body, timestamp }
+            })
         })
     }
 
